@@ -67,17 +67,16 @@ func set_bevel_width(new_value: float) -> void:
 
 func set_center_node(new_node: PackedScene = null) -> void:
 	center_node = new_node
-	var Menu: Node = $RadialMenu/CenterNode
+	var menu: CenterContainer = $RadialMenu/CenterNode
 	
-	var old_nodes: Array[Node] = Menu.get_children()
-	for child: Node in old_nodes:
+	for child: Node in menu.get_children():
 		child.set_visible(false)
 		child.queue_free()
 	
 	if not new_node: 
 		return
 	
-	Menu.add_child(new_node.instantiate())
+	menu.add_child(new_node.instantiate())
 
 func set_width_max(new_value: float) -> void:
 	if new_value - MIN_WIDTH < 0: return
@@ -87,7 +86,7 @@ func set_width_max(new_value: float) -> void:
 	
 	# Handle case where we're now smaller than the minimum size
 	if new_value - width_min < MIN_WIDTH:
-		self.set_width_min(new_value - MIN_WIDTH * 2)
+		self.set_width_min(new_value - (MIN_WIDTH * 2))
 	
 	self.emit_signal(&"sort_children")
 
@@ -99,7 +98,7 @@ func set_width_min(new_value: float) -> void:
 	
 	# Handle case where we're now bigger than the minimum size
 	if width_max - new_value < MIN_WIDTH:
-		self.set_width_max(new_value + MIN_WIDTH * 2)
+		self.set_width_max(new_value + (MIN_WIDTH * 2))
 	
 	var min_width = get_min_size() * new_value
 	$RadialMenu/CenterNode.custom_minimum_size = Vector2(min_width, min_width)
@@ -151,17 +150,7 @@ func setup() -> void:
 	self.set_modulate_hover(modulate_hover)
 	self.set_width_max(width_max)
 	self.set_width_min(width_min)
-
-# We want to remove_at our own scene children
-# so that we're only processing user added nodes
-func get_children(include_internal: bool = false) -> Array[Node]:
-	var to_return: Array[Node] = super.get_children(include_internal)
-	
-	# Remove as many child nodes as we have for the RadialMenu
-	# the remaining array will be all user added children
-	to_return.pop_front()
-	
-	return to_return
+	self.set_center_offset(center_offset)
 
 func get_min_size() -> float:
 	var size: Vector2 = self.get_size()
@@ -174,20 +163,18 @@ func reposition_buttons() -> void:
 	var angle_increment: float = (2 * PI) / len(buttons)
 	var center: Vector2 = self.get_rect().size / 2
 	
-	var rect: Rect2 = self.get_rect()
 	var min_size: float = self.get_min_size()
-	var min_vec = Vector2(min_size, min_size)
 	
 	var angle: float = 0
 	for button: Node in buttons:
 		var corner_pos: Vector2 = Vector2.from_angle(angle)
-		corner_pos *= min_vec / 2
+		corner_pos *= min_size / 2
 		
 		# Apply offset from center
 		corner_pos += corner_pos * center_offset
 		
-		if not min_vec.is_zero_approx():
-			corner_pos *= Vector2.ONE - (button.get_size() / min_vec) * 3
+		if not is_zero_approx(min_size):
+			corner_pos *= Vector2.ONE - (button.get_size() / min_size) * 3
 		
 		corner_pos -= button.get_size() / 2
 		corner_pos += center
@@ -218,7 +205,7 @@ func _on_sort_children() -> void:
 	
 	# Resize the background
 	$RadialMenu/Background.set_custom_minimum_size(Vector2(min_size, min_size))
-	$RadialMenu/Background.set_pivot_offset(Vector2(min_size / 2, min_size / 2))
+	$RadialMenu/Background.set_pivot_offset(Vector2(min_size, min_size) / 2.0)
 	
 	# Tell our cursor how many can be selected
 	if not Engine.is_editor_hint():
@@ -261,7 +248,7 @@ func _input(_event: InputEvent) -> void:
 	self.cursor_target = atan2(pos.y, pos.x)
 
 func _init() -> void:
-	self.add_child(preload("./RadialMenu.tscn").instantiate())
+	self.add_child(preload("./RadialMenu.tscn").instantiate(), false, Node.INTERNAL_MODE_FRONT)
 
 func _ready() -> void:
 	self.setup()

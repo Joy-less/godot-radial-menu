@@ -33,7 +33,6 @@ func get_cursor_index() -> int:
 
 func compute_index() -> void:
 	var current_index: int = self.get_cursor_index()
-	
 	if current_index == self.last_index:
 		return
 	
@@ -43,7 +42,6 @@ func compute_index() -> void:
 func touch_start(_event: InputEventScreenTouch) -> void:
 	if touches < 1:
 		cursor = Vector2(0, 0)
-	
 	touches += 1
 
 func touch_end(_event: InputEventScreenTouch) -> void:
@@ -54,14 +52,13 @@ func touch_end(_event: InputEventScreenTouch) -> void:
 
 func touch_drag(event: InputEventScreenDrag) -> void:
 	self.cursor += event.relative
-
+	
 	# Check for hover events
 	self.compute_index()
 
 func mouse_start(_event: InputEventMouseButton) -> void:
 	if touches < 1:
 		mouse_drag()
-
 	touches += 1
 
 func mouse_end(_event: InputEventMouseButton) -> void:
@@ -74,7 +71,7 @@ func mouse_drag(_event: InputEventMouseMotion = null) -> void:
 	var parent: Node = self.get_parent()
 	var center: Vector2 = self.get_global_position()
 	
-	self.cursor = (center - self.get_global_mouse_position()) * -1
+	self.cursor = -(center - self.get_global_mouse_position())
 	
 	# Check for hover events
 	self.compute_index()

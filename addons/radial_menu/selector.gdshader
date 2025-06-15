@@ -35,7 +35,7 @@ float is_in_bevel(vec2 uv) {
 	
 	return abs(
 		(outside - circle(uv, width_max - bevel_width))
-		+ (circle(uv, width_min + bevel_width))
+		+ circle(uv, width_min + bevel_width)
 	);
 }
 
