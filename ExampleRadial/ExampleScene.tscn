@@ -2,8 +2,8 @@
 
 [ext_resource type="Texture2D" uid="uid://cqfpatebwql8i" path="res://ExampleRadial/icons/flip.png" id="1"]
 [ext_resource type="Texture2D" uid="uid://c20y0j00t7tug" path="res://ExampleRadial/icons/volume.png" id="2"]
-[ext_resource type="Script" path="res://ExampleRadial/ExampleScene.gd" id="3"]
-[ext_resource type="Script" path="res://addons/radial_menu/RadialMenu.gd" id="4"]
+[ext_resource type="Script" uid="uid://b0j1rdtvxfdcp" path="res://ExampleRadial/ExampleScene.gd" id="3"]
+[ext_resource type="Script" uid="uid://c78panxg17xqv" path="res://addons/radial_menu/RadialMenu.gd" id="4"]
 
 [node name="ExampleScene" type="MarginContainer"]
 anchors_preset = 15
